@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: socialmedia_db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: socialmedia
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - socialmedia_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: socialmedia_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - socialmedia_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: socialmedia_backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/socialmedia
+      JWT_SECRET: your-secret-key
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - socialmedia_network
+
+  ml_service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: socialmedia_ml
+    ports:
+      - "8000:8000"
+    networks:
+      - socialmedia_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: socialmedia_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    depends_on:
+      - backend
+    networks:
+      - socialmedia_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  socialmedia_network:
+    driver: bridge
