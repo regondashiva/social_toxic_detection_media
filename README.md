@@ -357,12 +357,3 @@ For issues or questions:
 ## 📄 License
 
 MIT License - Feel free to use this project!
-
-## 🙏 Contributors
-
-Built with ❤️ for the community
-
----
-
-**Happy Coding! 🚀**
-"# social_toxic_detection_media" 
